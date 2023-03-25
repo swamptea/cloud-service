@@ -6,31 +6,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//таблица с файлами
 @Entity
-//@Table(name = "my_file")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MyFile {
+public class File {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-//    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Lob
- //   @Column(name = "file", columnDefinition="BLOB")
-    private byte[] file;
-
- //   @Column(name = "fileName")
     private String filename;
 
-//    @Column(name = "type")
-    private String type;
-
- //   @Column(name = "size")
     private Integer size;
+
+    @Lob
+    private byte[] myFile;
+
+    private String type;
 
 
 }

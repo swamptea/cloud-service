@@ -6,8 +6,8 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class ImageUtils {
-    public static byte[] compressImage(byte[] data){
+public class FileUtils {
+    public static byte[] compressFile(byte[] data){
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
         deflater.setInput(data);
@@ -26,7 +26,7 @@ public class ImageUtils {
         return outputStream.toByteArray();
     }
 
-    public static byte[] decompressImage(byte[] data) throws DataFormatException {
+    public static byte[] decompressFile(byte[] data) throws DataFormatException {
         Inflater inflater = new Inflater();
         inflater.setInput(data);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);

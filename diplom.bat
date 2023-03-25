@@ -1,0 +1,1 @@
+java -jar target/diplom-0.0.1-SNAPSHOT.jar.original
