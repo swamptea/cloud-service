@@ -2,7 +2,7 @@
 
 Учебный проект - backend облачного хранилища файлов.
 
-Для запуска нужно скачать и настроить [FRONT] (https://github.com/netology-code/jd-homeworks/tree/master/diploma/netology-diplom-frontend)
+Для запуска нужно скачать и настроить [FRONT](./netology-diplom-frontend)
 
 Описание и запуск FRONT
 
@@ -18,6 +18,7 @@
         Изменённый url сохранится для следующих запусков.
     По умолчанию FRONT запускается на порту 8080 и доступен по url в браузере http://localhost:8080.
         Если порт 8080 занят, FRONT займёт следующий доступный (8081). После выполнения npm run serve в терминале вы увидите, на каком порту он запустился.
+
 
 
 Перед запуском перейти в терминале в папку docker и выполнить docker-compose -f postgres.yml up -d
