@@ -1,66 +1,53 @@
 package com.swamptea.diplom.service;
 
-import com.swamptea.diplom.config.JwtService;
-import com.swamptea.diplom.domain.Role;
-import com.swamptea.diplom.domain.Token;
-import com.swamptea.diplom.domain.User;
-import com.swamptea.diplom.entity.AuthenticationRequest;
-import com.swamptea.diplom.entity.AuthenticationResponse;
-import com.swamptea.diplom.repo.TokenRepository;
+import com.swamptea.diplom.domain.Users;
 import com.swamptea.diplom.repo.UserRepository;
+import com.swamptea.diplom.security.AuthenticationRequest;
+import com.swamptea.diplom.security.AuthenticationResponse;
+import com.swamptea.diplom.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository repository;
-    private final TokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         if (repository.findByLogin(request.getLogin()).isPresent()) {
-            authenticationManager.authenticate(
+           authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getLogin(),
                             request.getPassword()
                     )
             );
+
             var user = repository.findByLogin(request.getLogin())
                     .orElseThrow();
-            var jwtToken = jwtService.generateToken(user);
-            Token token = Token.builder()
-                    .t("Bearer " + jwtToken).build();
-            tokenRepository.save(token);
+
+            Map<String, Object> claims = new HashMap<>();
+            claims.put(request.getLogin(), user);
+            var jwtToken = jwtService.generateToken(claims, user);
+
             return AuthenticationResponse.builder()
                     .token(jwtToken)
                     .build();
-        } else {
-            var user = User.builder()
-                    .login(request.getLogin())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .role(Role.USER)
-                    .build();
-
-            repository.save(user);
-            var jwtToken = jwtService.generateToken(user);
-            Token token = Token.builder()
-                    .t("Bearer " + jwtToken).build();
-            tokenRepository.save(token);
-            return AuthenticationResponse.builder()
-                    .token(jwtToken)
-                    .build();
-        }
+        } else return null;
     }
 
-    public boolean isTokenValid(String token) {
-        return tokenRepository.findByT(token) != null;
+    public Optional<Users> getUser(String login) {
+        return repository.findByLogin(login);
     }
-
 }

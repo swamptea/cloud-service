@@ -27,5 +27,9 @@ public class File {
 
     private String type;
 
+    private String owner;
 
+    public String getOwner() {
+        return owner;
+    }
 }

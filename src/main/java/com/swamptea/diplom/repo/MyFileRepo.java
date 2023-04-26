@@ -6,10 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Optional;
+
 @Transactional
 public interface MyFileRepo extends CrudRepository<File, Long> {
 
-    File findByFilename(String filename);
+    Optional<File> findByFilename(String filename);
+
+    Iterable findAllByOwner(String user);
 
     //для замены имени файла в базе
     @Modifying

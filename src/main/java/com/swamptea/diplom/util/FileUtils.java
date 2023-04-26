@@ -7,7 +7,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class FileUtils {
-    public static byte[] compressFile(byte[] data){
+    public static byte[] compressFile(byte[] data) {
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
         deflater.setInput(data);
@@ -15,11 +15,11 @@ public class FileUtils {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
         byte[] tmp = new byte[4 * 1024];
-        while(!deflater.finished()){
+        while (!deflater.finished()) {
             int size = deflater.deflate(tmp);
             outputStream.write(tmp, 0, size);
         }
-        try{
+        try {
             outputStream.close();
         } catch (IOException ignored) {
         }
@@ -32,7 +32,7 @@ public class FileUtils {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
         byte[] tmp = new byte[4 * 1024];
         try {
-            while(!inflater.finished()){
+            while (!inflater.finished()) {
                 int count = inflater.inflate(tmp);
                 outputStream.write(tmp, 0, count);
             }

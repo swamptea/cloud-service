@@ -1,4 +1,4 @@
-package com.swamptea.diplom.entity;
+package com.swamptea.diplom.security;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

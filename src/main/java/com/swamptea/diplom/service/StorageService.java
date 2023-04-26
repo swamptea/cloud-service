@@ -1,6 +1,7 @@
 package com.swamptea.diplom.service;
 
 import com.swamptea.diplom.domain.File;
+import com.swamptea.diplom.domain.Role;
 import com.swamptea.diplom.repo.MyFileRepo;
 import com.swamptea.diplom.util.FileUtils;
 import org.springframework.stereotype.Service;
@@ -18,41 +19,45 @@ public class StorageService {
         this.repository = repository;
     }
 
-    public boolean uploadFile(MultipartFile file) throws IOException { //загрузить файл в бд
-        if (repository.findByFilename(file.getOriginalFilename()) == null) {
+    public boolean uploadFile(MultipartFile file, String user) throws IOException { //загрузить файл в бд
+        if (repository.findByFilename(user + "_" + file.getOriginalFilename()).isEmpty()) {
             File fileData = repository.save(File.builder()
-                    .filename(file.getOriginalFilename())
+                    .filename(user + "_" + file.getOriginalFilename())
                     .type(file.getContentType())
                     .myFile(FileUtils.compressFile(file.getBytes()))
                     .size((int) file.getSize())
+                    .owner(user)
                     .build());
             return true;
         }
         return false;
     }
 
-    public byte[] downloadFile(String fileName) throws DataFormatException { //скачать файл
-        Optional<File> file = Optional.ofNullable(repository.findByFilename(fileName));
-        if (file.isPresent()) {
+    public byte[] downloadFile(String fileName, String login, Role role) throws DataFormatException { //скачать файл
+        Optional<File> file = Optional.of(repository.findByFilename(fileName).get());
+        if (repository.findByFilename(fileName).get().getOwner().equals(login) || role == Role.ADMIN) {
             return FileUtils.decompressFile(file.get().getMyFile());
         } else return null;
     }
 
-    public boolean deleteFile(String filename) { //удалить файл
-        if (repository.findByFilename(filename) != null) {
-            repository.delete(repository.findByFilename(filename));
+    public boolean deleteFile(String filename, String login, Role role) { //удалить файл
+        if (repository.findByFilename(filename).isPresent() &&
+                (repository.findByFilename(filename).get().getOwner().equals(login) || role == Role.ADMIN)) {
+            repository.delete(repository.findByFilename(filename).get());
             return true;
         } else return false;
     }
 
-    public boolean editFileName(String filename, String newName) { //изменить название
+    public boolean editFileName(String filename, String login, String newName, Role role) { //изменить название
         String[] filenameArr = newName.split("\"");
         try {
             String newFileName = filenameArr[3];
-            File file = repository.findByFilename(filename);
+            File file = repository.findByFilename(filename).get();
             if (file != null) {
-                repository.setFilename(file.getFilename(), newFileName);
-                return true;
+                if (file.getOwner().equals(login) || role == Role.ADMIN) {
+                    repository.setFilename(file.getFilename(), newFileName);
+                    return true;
+                } else return false;
             } else return false;
 
         } catch (NullPointerException e) {
@@ -63,5 +68,9 @@ public class StorageService {
     public Iterable all() {
         return repository.findAll();
     } //все файлы
+
+    public Iterable allForUser(String userId) {
+        return repository.findAllByOwner(userId);
+    } //все файлы для юзера
 
 }
